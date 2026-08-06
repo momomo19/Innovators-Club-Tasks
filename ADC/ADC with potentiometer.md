@@ -1,1 +1,0 @@
-This task maps the analog values of the potentiometer which can be seen in Live Expressions.

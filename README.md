@@ -1,12 +1,1 @@
-# Innovators-Club-Tasks
-A collection of STM32CubeMX and STM32CubeIDE projects completed while learning embedded systems.
-
-Skills
-- GPIO
-- Interrupts
-- UART
-- SPI
-- ADC
-- DMA
-- Timers
-- PWM
+To fix button bounce, we have to force the microcontroller to wait about 50 milliseconds for the physical metal contacts to settle before trusting the signal. There are two ways to handle this wait in software: blocking debounce using HAL_Delay() which pauses all tasks done by the processor & non-blocking debounce using HAL_GetTick(). Here, non-blocking debounce is used to avoid paralyzing the processor

@@ -1,1 +1,1 @@
-To fix button bounce, we have to force the microcontroller to wait about 50 milliseconds for the physical metal contacts to settle before trusting the signal. There are two ways to handle this wait in software: blocking debounce using HAL_Delay() which pauses all tasks done by the processor & non-blocking debounce using HAL_GetTick(). Here, non-blocking debounce is used to avoid paralyzing the processor
+This project tests whether an integrated circuit (IC) is an AND gate or not by testing the output of several combinations of inputs.

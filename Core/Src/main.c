@@ -21,7 +21,30 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+typedef enum{
+	BUTTON_PRESSED,
+	BUTTON_HELD,
+	BUTTON_UNCHANGED
+} buttonAction;
 
+buttonAction getButtonAction(void){
+	static uint32_t last_debounce_time = 0;
+	static uint8_t last_stable_state = GPIO_PIN_SET;
+	uint8_t curr_reading = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1);
+	if(curr_reading != last_stable_state){
+		last_debounce_time = HAL_GetTick();
+	}
+	if((HAL_GetTick() - last_debounce_time) > 50){
+		if(curr_reading != last_stable_state){
+			last_stable_state = curr_reading;
+			return BUTTON_PRESSED;
+		}
+	}
+	if(curr_reading == GPIO_PIN_RESET && (HAL_GetTick() - last_debounce_time) > 300){
+		return BUTTON_HELD;
+	}
+	return BUTTON_UNCHANGED;
+}
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,29 +77,7 @@ buttonAction getButtonAction(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t count = 0;
 
-typedef enum{
-	BUTTON_PRESSED,
-	BUTTON_RELEASED,
-	BUTTON_UNCHANGED
-} buttonAction;
-
-buttonAction getButtonAction(void){
-	static uint32_t last_debounce_time = 0;
-	static uint8_t last_stable_state = GPIO_PIN_SET;
-	uint8_t curr_reading = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if(curr_reading != last_stable_state){
-		last_debounce_time = HAL_GetTick();
-	}
-	if((HAL_GetTick() - last_debounce_time) > 50){
-		if(curr_reading != last_stable_state){
-			last_stable_state = curr_reading;
-			return (last_stable_state == GPIO_PIN_RESET) ? BUTTON_PRESSED : BUTTON_RELEASED;
-		}
-	}
-	return BUTTON_UNCHANGED;
-}
 /* USER CODE END 0 */
 
 /**
@@ -117,11 +118,38 @@ int main(void)
   while (1)
   {
 	  if(getButtonAction() == BUTTON_PRESSED){
-		  count++;
-		  if(count == 3){
-			  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_13);
-			  count = 0;
-		  }
+		  int is_and = 1;
+
+		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+		  HAL_Delay(1);
+		  if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0) != 0) is_and = 0;
+
+		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
+		  HAL_Delay(1);
+		  if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0) != 0) is_and = 0;
+
+		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+		  HAL_Delay(1);
+		  if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0) != 0) is_and = 0;
+
+		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
+		  HAL_Delay(1);
+		  if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0) != 1) is_and = 0;
+
+	  	if(is_and){
+	  		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_SET);
+	  	}
+	  	else{
+	  		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+	  	}
+	  }
+	  if(getButtonAction() == BUTTON_HELD){
+	  	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET);
+	  	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
 	  }
     /* USER CODE END WHILE */
 
@@ -187,16 +215,29 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_3|GPIO_PIN_4, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : PA0 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0;
+  /*Configure GPIO pin : PA1 */
+  GPIO_InitStruct.Pin = GPIO_PIN_1;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PB13 */
-  GPIO_InitStruct.Pin = GPIO_PIN_13;
+  /*Configure GPIO pin : PB1 */
+  GPIO_InitStruct.Pin = GPIO_PIN_1;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PB13 PB14 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13|GPIO_PIN_14;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PB3 PB4 */
+  GPIO_InitStruct.Pin = GPIO_PIN_3|GPIO_PIN_4;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

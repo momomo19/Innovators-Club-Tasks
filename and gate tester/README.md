@@ -1,0 +1,1 @@
+This project tests whether an integrated circuit (IC) is an AND gate or not by testing the output of several combinations of inputs.

@@ -1,0 +1,1 @@
+This task is for an H-Bridge circuit using mosfets to control a DC motor. The potentiometer controls the motor's speed while the switch controls its direction.

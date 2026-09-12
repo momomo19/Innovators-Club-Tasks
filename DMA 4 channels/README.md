@@ -1,0 +1,1 @@
+This task showcases direct communication with hardware (4 potentiometers) using DMA to avoid involving the processor.

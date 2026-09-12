@@ -1,0 +1,1 @@
+This tasks implements sequential tail lights that have a hazard (breathing) animation by default, right sweep when the button is pressed and left sweep when the button is pressed again. The potentiometer controls the speed of the animations.

@@ -1,0 +1,1 @@
+This task demonstrates a non-blocking UART transmission which continuously reads an ADC value from a potentiometer and transmits it as a formatted packet using DMA.

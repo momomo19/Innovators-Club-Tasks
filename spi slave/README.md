@@ -1,0 +1,1 @@
+This task uses a full-duplex SPI system to transfer data between master and slave STMs. The master sends a value to the slave and the slave returns that value to the master with an increment.

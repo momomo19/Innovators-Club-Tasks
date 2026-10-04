@@ -5,4 +5,4 @@ electric car to race in Shell's International Eco-marathon competition. These ar
 embedded electronics tasks we worked on that built up the skills that we're now using to develop the car's
 actual dashboard and GUI pitwall.
 
-![Innovators Car]("Innovators-Club-Tasks/innocar.jpeg")
+![Innovators Car](innocar.jpeg)
